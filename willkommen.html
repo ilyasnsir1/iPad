@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en" class="webmadewell">
+<head>
+  <meta charset="UTF-8">
+  <title>japon &amp; quiz anleitung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .webmadewell {
+      background-color: white;
+    }
+    body {
+      margin: 0;
+    }
+    /* Fixierter Header mit Hintergrundbild */
+    .sample-header {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      background-image: url("https://images.unsplash.com/photo-1649583693539-f36f908da137?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+    /* Header-Content */
+    .sample-header-section {
+      position: relative;
+      padding: 15% 0 10%;
+      max-width: 640px;
+      margin: 0 auto;
+      color: white;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+      font-family: "Montserrat", sans-serif;
+      text-align: center;
+    }
+    h1 {
+      font-weight: 500;
+    }
+    .sample-header-section h1 {
+      font-family: "SF Pro", sans-serif;
+    }
+    /* Der neue Wasserzeichen-Text */
+    .sample-header .watermark {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.8em;
+      color: rgba(255,255,255,0.8);
+      z-index: 10;
+    }
+    /* Button-Container */
+    .button-container {
+      display: flex;
+      justify-content: space-around;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .button-87-translation {
+      flex: 1;
+      margin: 10px;
+      padding: 15px 30px;
+      text-align: center;
+      text-transform: uppercase;
+      transition: 0.5s;
+      background-size: 200%;
+      color: rgb(0, 0, 0);
+      border-radius: 10px;
+      display: inline-block;
+      border: 0;
+      font-weight: 700;
+      background-image: linear-gradient(45deg, #ffffff 0%, #cccccc 51%, #ffffff 100%);
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      text-shadow: none;
+    }
+    .button-87-translation:hover {
+      background-position: right center;
+      text-decoration: none;
+    }
+    .button-87-translation:active {
+      transform: scale(0.95);
+    }
+    .button-87-translation .btn-content {
+      display: inline-block;
+      transition: opacity 0.5s, transform 0.5s;
+      opacity: 1;
+    }
+    .button-87-translation:hover .btn-content {
+      opacity: 0;
+    }
+    .button-87-translation::after {
+      content: attr(data-hover);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      color: inherit;
+      font: inherit;
+      line-height: inherit;
+      white-space: nowrap;
+    }
+    .button-87-translation:hover::after {
+      opacity: 1;
+    }
+    .sample-section-wrap {
+      position: relative;
+      background-color: white;
+    }
+    .sample-section {
+      position: relative;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 40px;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    .sample-section h2, .sample-section h3 {
+      color: #222;
+    }
+    .sample-section table {
+      background: rgba(0,0,0,0.7);
+      border-collapse: collapse;
+      margin: 10px 0;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .sample-section table th,
+    .sample-section table td {
+      padding: 10px 15px;
+      text-align: center;
+      border: 1px solid rgba(54,54,54,0.3);
+      color: #fff;
+    }
+    .sample-section pre {
+      background: #f4f4f4;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    .masked-text {
+      font-size: 3rem;
+      font-weight: bold;
+      color: transparent;
+      background-image: url('https://i.imgur.com/3CBD9QF.png');
+      background-size: 200%;
+      background-repeat: repeat-x;
+      background-position: 0 50%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: animate-background 30s linear infinite;
+    }
+    @keyframes animate-background {
+      0% {
+        background-position: 0 50%;
+      }
+      100% {
+        background-position: -200% 50%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sample-header">
+    <div class="sample-header-section">
+      <h1 class="masked-text">Wähle die Übung aus, die du gerne lernen möchtest!</h1>
+      <div class="button-container">
+        <a href="hiragana.html" class="button-87-translation" data-hover="ひらがな" role="button">
+          <span class="btn-content">Hiragana</span>
+        </a>
+        <a href="katakana.html" class="button-87-translation" data-hover="カタカナ" role="button">
+          <span class="btn-content">Katakana</span>
+        </a>
+        <a href="firstgradekanji.html" class="button-87-translation" data-hover="小学一年生の漢字" role="button">
+          <span class="btn-content">1st grade K</span>
+        </a>
+      </div>
+    </div>
+    <!-- Wasserzeichen: Immer unten links im Header sichtbar -->
+    <div class="watermark">Ilyas Version 1.8</div>
+  </div>
+  
+  <div class="sample-section-wrap">
+    <div class="sample-section">
+      <h2>Willkommen auf meiner Übungsseite!</h2>
+      <p>Auf dieser Seite hast du aktuell die Möglichkeit, <strong>Hiragana</strong>, <strong>Katakana</strong> sowie die ersten Kanji der 1. Schulstufe zu üben. Doch das ist erst der Anfang! Schon bald wird es noch mehr Übungsaufgaben und neue Lerninhalte geben, damit du dein Japanisch weiter verbessern kannst.</p>
+      
+      <h3>Hinweis zu Makronbuchstaben in der Romanisierung</h3>
+      <p>In der japanischen Sprache gibt es keine Umlaute wie <strong>ä, ö, ü</strong> im Deutschen. Allerdings können die verlängerten Vokale – insbesondere <strong>ū</strong> und <strong>ō</strong> – für die Romanisierung (Hepburn-Transkription) von Japanisch genutzt werden.</p>
+      <p>Hier erfährst du, wie du <strong>alle verlängerten Vokale (ā, ī, ū, ē, ō)</strong> auf <strong>Windows</strong> eingeben kannst:</p>
+
+      <h3>Wie läuft ein Quiz ab?</h3>
+      <p>Jedes dieser Übungsaufgaben nutzt einen Zufallsgenerator, um dir jedes Mal eine neue Herausforderung zu bieten. Es gibt momentan 3 Übungsaufgaben: <strong>Hiragana, Katakana und First grade Kanji</strong>. Du kannst selbst entscheiden, welche Kategorie du üben möchtest.</p>
+      <p><strong>Zeitlimit:</strong> Jede Runde dauert <strong>10 Minuten</strong>.</p>
+      <p><strong>Runde wiederholen:</strong> Am Ende der Runde kannst du das Quiz erneut mit denselben Einstellungen starten, indem du auf den <strong>"Wiederholen"</strong> Button klickst.</p>
+      <p><strong>Fehlermeldung:</strong> Falls du Fehler gemacht hast, erscheint oben ein <strong>Chevron-Symbol</strong>, das dir die falschen Antworten anzeigt.</p>
+      <p>Viel Erfolg beim Üben!</p>
+      
+      <h3>1. Mit ALT-Codes (Nummernblock erforderlich)</h3>
+      <p>Falls dein Computer einen Nummernblock hat, kannst du folgende Tastenkombinationen nutzen:</p>
+      <table>
+        <tr>
+          <th>Zeichen</th>
+          <th>ALT-Code</th>
+        </tr>
+        <tr>
+          <td>ā</td>
+          <td>ALT + 0257</td>
+        </tr>
+        <tr>
+          <td>Ā</td>
+          <td>ALT + 0256</td>
+        </tr>
+        <tr>
+          <td>ī</td>
+          <td>ALT + 0299</td>
+        </tr>
+        <tr>
+          <td>Ī</td>
+          <td>ALT + 0298</td>
+        </tr>
+        <tr>
+          <td>ū</td>
+          <td>ALT + 0363</td>
+        </tr>
+        <tr>
+          <td>Ū</td>
+          <td>ALT + 0362</td>
+        </tr>
+        <tr>
+          <td>ē</td>
+          <td>ALT + 0275</td>
+        </tr>
+        <tr>
+          <td>Ē</td>
+          <td>ALT + 0274</td>
+        </tr>
+        <tr>
+          <td>ō</td>
+          <td>ALT + 0333</td>
+        </tr>
+        <tr>
+          <td>Ō</td>
+          <td>ALT + 0332</td>
+        </tr>
+      </table>
+      <p><strong>So geht’s:</strong><br>
+      - Halte die <strong>ALT-Taste</strong> gedrückt.<br>
+      - Tippe den entsprechenden Code auf dem Nummernblock ein.<br>
+      - Lasse die <strong>ALT-Taste</strong> los.</p>
+      
+      <h3>2. Mit der Windows-Zeichentabelle (Charmap)</h3>
+      <ol>
+        <li>Drücke <strong>Windows + R</strong> und gib <strong>charmap</strong> ein, dann <strong>Enter</strong>.</li>
+        <li>Suche die Zeichen <strong>ā, ī, ū, ē, ō</strong> in der Tabelle.</li>
+        <li>Klicke auf <strong>Kopieren</strong> und füge sie mit <strong>Strg + V</strong> ein.</li>
+      </ol>
+      
+      <h3>3. Mit der Unicode-Eingabe (Word, Outlook, etc.)</h3>
+      <ol>
+        <li>Tippe den Unicode des Zeichens ein (siehe unten).</li>
+        <li>Drücke dann <strong>ALT + X</strong>.</li>
+      </ol>
+      <table>
+        <tr>
+          <th>Zeichen</th>
+          <th>Unicode</th>
+        </tr>
+        <tr>
+          <td>ā</td>
+          <td>0101</td>
+        </tr>
+        <tr>
+          <td>Ā</td>
+          <td>0100</td>
+        </tr>
+        <tr>
+          <td>ī</td>
+          <td>012B</td>
+        </tr>
+        <tr>
+          <td>Ī</td>
+          <td>012A</td>
+        </tr>
+        <tr>
+          <td>ū</td>
+          <td>016B</td>
+        </tr>
+        <tr>
+          <td>Ū</td>
+          <td>016A</td>
+        </tr>
+        <tr>
+          <td>ē</td>
+          <td>0113</td>
+        </tr>
+        <tr>
+          <td>Ē</td>
+          <td>0112</td>
+        </tr>
+        <tr>
+          <td>ō</td>
+          <td>014D</td>
+        </tr>
+        <tr>
+          <td>Ō</td>
+          <td>014C</td>
+        </tr>
+      </table>
+      <p><strong>Beispiel:</strong><br>
+      Tippe <strong>016B</strong>, drücke <strong>ALT + X</strong> – es wird in <strong>ū</strong> umgewandelt.</p>
+      
+      <h3>4. Mit einer Internationalen Tastatur (US-International)</h3>
+      <ol>
+        <li>Gehe zu <strong>Einstellungen → Zeit &amp; Sprache → Sprache &amp; Region</strong>.</li>
+        <li>Wähle <strong>Englisch (USA) – International</strong> als Tastaturlayout.</li>
+        <li>Nun kannst du Vokale mit Makron schreiben: Drücke <code>"</code> (Shift + <code>"</code>) und dann den gewünschten Buchstaben (z. B. <strong>u</strong> ergibt <strong>ū</strong>).</li>
+      </ol>
+      
+      <h3>5. Mit AutoHotkey (für häufige Nutzung)</h3>
+      <ol>
+        <li>Installiere <strong>AutoHotkey</strong>.</li>
+        <li>Erstelle ein neues Skript mit folgendem Inhalt:
+          <pre><code>::a::ā
+::A::Ā
+::i::ī
+::I::Ī
+::u::ū
+::U::Ū
+::e::ē
+::E::Ē
+::o::ō
+::O::Ō</code></pre>
+        </li>
+        <li>Speichere die Datei als <strong>.ahk</strong> und starte das Skript.</li>
+      </ol>
+    </div>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+  <script>
+    function parallax_height() {
+      var scroll_top = $(window).scrollTop();
+      var header_height = $(".sample-header-section").outerHeight();
+      $(".sample-section").css({ "margin-top": header_height });
+      $(".sample-header").css({ height: header_height - scroll_top });
+    }
+    parallax_height();
+    $(window).scroll(function() {
+      parallax_height();
+    });
+    $(window).resize(function() {
+      parallax_height();
+    });
+  </script>
+</body>
+</html>

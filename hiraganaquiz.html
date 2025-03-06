@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>hiragana quiz</title>
+  <style>
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-image: url('https://images.unsplash.com/photo-1528164344705-47542687000d?q=80&w=2092&auto=format&fit=crop&ixlib=rb-4.0.3');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: rgb(255, 255, 255);
+      position: relative;
+    }
+    /* Das abgefragte Hiragana ist nun nicht mehr verschoben */
+    #hiragana {
+      font-size: 50px;
+      margin: 20px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 20px;
+      margin-top: 10px;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    .glassyNumber {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 6px 8px;
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #score, #timer {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 20px;
+      margin-top: 10px;
+      border: 2px solid transparent;
+      outline: none;
+      transition: border 0.3s;
+    }
+    input:focus,
+    input:hover {
+      border: 2px solid black;
+    }
+    input:disabled,
+    input:disabled:hover {
+      border: 2px solid transparent;
+      cursor: default;
+    }
+    .button-container {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    #restart {
+      display: none; 
+    }
+    .action-button {
+      background-color: rgba(255, 255, 255, 0.7);
+      color: black;
+      border: none;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .action-button:not(:disabled):hover {
+      background-color: rgba(255, 255, 255, 0.9);
+      transform: scale(1.05);
+    }
+    .action-button:disabled,
+    .action-button:disabled:hover {
+      opacity: 0.3;
+      cursor: default;
+      transform: none;
+    }
+    .action-button.quiz-ended,
+    .action-button.quiz-ended:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+      border: 2px solid transparent;
+      color: #999;
+      cursor: default;
+      transform: none;
+      opacity: 1;
+    }
+    /* Ergebnis-Panel: Wird nur eingeblendet, wenn die Runde beendet ist und Fehler vorliegen.
+       Im geschlossenen Zustand ragt es ca. 44px (Fingerbreite) heraus. */
+    #resultPanel {
+      display: none;
+      position: fixed;
+      top: calc(-33% + 44px);
+      left: 0;
+      width: 100%;
+      height: 33%;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      z-index: 1000;
+      padding: 20px;
+      transition: top 0.3s ease;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    /* Offener Zustand */
+    #resultPanel.open {
+      top: 0;
+    }
+    /* Toggle-Button (Chevron) – innerhalb des Panels, am unteren Rand verankert */
+    #togglePanel {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      z-index: 1001;
+      width: 44px;
+      height: 44px;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #togglePanel svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      transition: transform 0.2s;
+    }
+    /* Dreht den Chevron, wenn das Panel offen ist */
+    #resultPanel.open #togglePanel svg {
+      transform: rotate(180deg);
+    }
+    /* Stil für die Liste falscher Antworten */
+    #wrongListContainer {
+      margin-top: 20px;
+      width: 400px;
+      max-height: calc(100% - 80px);
+      margin: 20px auto 0 auto;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    #wrongListContainer::-webkit-scrollbar {
+      width: 8px;
+    }
+    #wrongListContainer::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      margin-top: 20%;
+      margin-bottom: 20%;
+    }
+    #wrongListContainer::-webkit-scrollbar-thumb {
+      background: rgba(200,200,200,0.8);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Hiragana</h1>
+  <div id="hiragana">?</div>
+  <input type="text" id="answer" placeholder="Antwort eingeben..." autocomplete="off">
+  <button id="checkButton" class="action-button" onclick="checkAnswer()">Überprüfen</button>
+  <div id="message"></div>
+  <div id="score">
+    Richtige Antworten:
+    <span id="answersValue" class="glassyNumber">0</span>
+    | Prozentsatz:
+    <span id="percentValue" class="glassyNumber">0.00%</span>
+  </div>
+  <div id="timer">
+    Zeit:
+    <span id="timeValue" class="glassyNumber">10:00</span>
+  </div>
+  <div class="button-container">
+    <button class="action-button" onclick="goBack()">Zurück</button>
+    <button id="restart" class="action-button" onclick="restartQuiz()">Wiederholen</button>
+  </div>
+
+  <!-- Ergebnis-Panel inkl. Toggle-Button -->
+  <div id="resultPanel">
+    <div id="resultHeader">
+      <h2>Hier siehst du deine falschen Antworten aufgelistet!</h2>
+    </div>
+    <div id="wrongListContainer">
+      <div id="wrongList"></div>
+    </div>
+    <!-- Der Chevron befindet sich am unteren Rand des Panels -->
+    <div id="togglePanel">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    let answerLocked = false;
+    
+    function goBack() {
+      window.location.href = "hiragana.html";
+    }
+    function restartQuiz() {
+      location.reload();
+    }
+
+    const hiraganaMap = {
+      "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
+      "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
+      "さ": "sa", "し": "shi", "す": "su", "せ": "se", "そ": "so",
+      "た": "ta", "ち": "chi", "つ": "tsu", "て": "te", "と": "to",
+      "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
+      "は": "ha", "ひ": "hi", "ふ": "fu", "へ": "he", "ほ": "ho",
+      "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
+      "や": "ya", "ゆ": "yu", "よ": "yo",
+      "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
+      "わ": "wa", "を": "wo",
+      "ん": "n",
+      "が": "ga", "ぎ": "gi", "ぐ": "gu", "げ": "ge", "ご": "go",
+      "ざ": "za", "じ": "ji", "ず": "zu", "ぜ": "ze", "ぞ": "zo",
+      "だ": "da", "ぢ": "ji", "づ": "zu", "で": "de", "ど": "do",
+      "ば": "ba", "び": "bi", "ぶ": "bu", "べ": "be", "ぼ": "bo",
+      "ぱ": "pa", "ぴ": "pi", "ぷ": "pu", "ぺ": "pe", "ぽ": "po",
+      "きゃ": "kya", "きゅ": "kyu", "きょ": "kyo",
+      "しゃ": "sha", "しゅ": "shu", "しょ": "sho",
+      "ちゃ": "cha", "ちゅ": "chu", "ちょ": "cho",
+      "にゃ": "nya", "にゅ": "nyu", "にょ": "nyo",
+      "ひゃ": "hya", "ひゅ": "hyu", "ひょ": "hyo",
+      "みゃ": "mya", "みゅ": "myu", "みょ": "myo",
+      "りゃ": "rya", "りゅ": "ryu", "りょ": "ryo",
+      "ぎゃ": "gya", "ぎゅ": "gyu", "ぎょ": "gyo",
+      "じゃ": "ja", "じゅ": "ju", "じょ": "jo",
+      "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
+      "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
+      "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
+    };
+
+    let correctAnswers = 0;
+    let totalAnswers = 0;
+    let timerStarted = false;
+    let timeLeft = 600;
+    let timerInterval;
+    let wrongResults = [];
+    
+    let selectedHiraganaLines = JSON.parse(localStorage.getItem("selectedHiraganaLines")) || [];
+    const hiraganaGroups = {
+      "a": ["あ", "い", "う", "え", "お"],
+      "ka": ["か", "き", "く", "け", "こ"],
+      "sa": ["さ", "し", "す", "せ", "そ"],
+      "ta": ["た", "ち", "つ", "て", "と"],
+      "na": ["な", "に", "ぬ", "ね", "の"],
+      "ha": ["は", "ひ", "ふ", "へ", "ほ"],
+      "ma": ["ま", "み", "む", "め", "も"],
+      "ya": ["や", "ゆ", "よ"],
+      "ra": ["ら", "り", "る", "れ", "ろ"],
+      "wa": ["わ", "を"],
+      "n": ["ん"],
+      "ga": ["が", "ぎ", "ぐ", "げ", "ご"],
+      "za": ["ざ", "じ", "ず", "ぜ", "ぞ"],
+      "da": ["だ", "ぢ", "づ", "で", "ど"],
+      "ba": ["ば", "び", "ぶ", "べ", "ぼ"],
+      "pa": ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"],
+      "kya": ["きゃ", "きゅ", "きょ"],
+      "sha": ["しゃ", "しゅ", "しょ"],
+      "cha": ["ちゃ", "ちゅ", "ちょ"],
+      "nya": ["にゃ", "にゅ", "にょ"],
+      "hya": ["ひゃ", "ひゅ", "ひょ"],
+      "mya": ["みゃ", "みゅ", "みょ"],
+      "rya": ["りゃ", "りゅ", "りょ"],
+      "gya": ["ぎゃ", "ぎゅ", "ぎょ"],
+      "ja": ["じゃ", "じゅ", "じょ"],
+      "dya": ["ぢゃ", "ぢゅ", "ぢょ"],
+      "bya": ["びゃ", "びゅ", "びょ"],
+      "pya": ["ぴゃ", "ぴゅ", "ぴょ"]
+    };
+
+    let hiraganaList = [];
+    selectedHiraganaLines.forEach(line => {
+      if (hiraganaGroups[line]) {
+        hiraganaList = hiraganaList.concat(hiraganaGroups[line]);
+      }
+    });
+    if (hiraganaList.length === 0) {
+      alert("Fehler: Keine passenden Hiragana gefunden. Bitte Auswahl überprüfen.");
+      window.location.href = "hiragana.html";
+    }
+
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timeValue").textContent = "00:00";
+          document.getElementById("answer").disabled = true;
+          const btn = document.getElementById("checkButton");
+          btn.disabled = true;
+          btn.classList.add("quiz-ended");
+          checkEndQuiz();
+          return;
+        }
+        timeLeft--;
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        document.getElementById("timeValue").textContent = 
+          `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    function nextQuestion() {
+      if (hiraganaList.length === 0) {
+        checkEndQuiz();
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * hiraganaList.length);
+      currentHiragana = hiraganaList.splice(randomIndex, 1)[0];
+      document.getElementById("hiragana").textContent = currentHiragana;
+      document.getElementById("answer").value = "";
+      document.getElementById("message").textContent = "";
+      toggleCheckButton();
+    }
+
+    function checkAnswer() {
+      if (answerLocked) return;
+      const userInputRaw = document.getElementById("answer").value;
+      if (userInputRaw.trim() === "") return;
+      answerLocked = true;
+
+      const userInput = userInputRaw.trim().toLowerCase();
+      if (!timerStarted) {
+        timerStarted = true;
+        startTimer();
+      }
+      totalAnswers++;
+      if (userInput === hiraganaMap[currentHiragana]) {
+        document.getElementById("message").textContent = "Good Boy! ✅";
+        correctAnswers++;
+      } else {
+        document.getElementById("message").textContent = 
+          `Falsch, du Ayri! ❌ Richtige Antwort: ${hiraganaMap[currentHiragana]}`;
+        wrongResults.push({
+          question: currentHiragana,
+          userAnswer: userInput,
+          correctAnswer: hiraganaMap[currentHiragana]
+        });
+      }
+      updateScore();
+      setTimeout(() => {
+        nextQuestion();
+        answerLocked = false;
+        toggleCheckButton();
+      }, 1000);
+    }
+
+    function updateScore() {
+      let percentage = ((correctAnswers / totalAnswers) * 100).toFixed(2);
+      document.getElementById("answersValue").textContent = correctAnswers;
+      document.getElementById("percentValue").textContent = `${percentage}%`;
+    }
+
+    function checkEndQuiz() {
+      document.getElementById("message").textContent = 
+        "Quiz beendet! Alle Hiragana wurden abgefragt.";
+      document.getElementById("answer").disabled = true;
+      const btn = document.getElementById("checkButton");
+      btn.disabled = true;
+      btn.classList.add("quiz-ended");
+      clearInterval(timerInterval);
+      document.getElementById("restart").style.display = "block";
+      // Zeige das Ergebnis-Panel nur, wenn es Fehler gab
+      if(wrongResults.length > 0){
+        document.getElementById("resultPanel").style.display = "block";
+      }
+    }
+
+    function updateWrongList() {
+      const wrongListDiv = document.getElementById("wrongList");
+      wrongListDiv.innerHTML = "";
+      if (wrongResults.length === 0) {
+        wrongListDiv.innerHTML = "<p>Keine falschen Antworten.</p>";
+        return;
+      }
+      wrongResults.forEach(item => {
+        const p = document.createElement("p");
+        p.innerHTML = `<strong>${item.question}</strong>: Deine Antwort: 
+        <span style="color: red;">${item.userAnswer}</span> | Richtig wäre: 
+        <span style="color: green;">${item.correctAnswer}</span>`;
+        wrongListDiv.appendChild(p);
+      });
+    }
+
+    // Ersetze die Touch-Event-Listener
+    const togglePanel = document.getElementById("togglePanel");
+    const resultPanel = document.getElementById("resultPanel");
+    
+    togglePanel.addEventListener("click", function(e) {
+      e.preventDefault();
+      if (!resultPanel.classList.contains("open")) {
+        updateWrongList();
+        resultPanel.classList.add("open");
+      } else {
+        resultPanel.classList.remove("open");
+      }
+    });
+
+    togglePanel.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      if (!resultPanel.classList.contains("open")) {
+        updateWrongList();
+        resultPanel.classList.add("open");
+      } else {
+        resultPanel.classList.remove("open");
+      }
+    });
+
+    // Verhindere das Schließen beim Scrollen
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let isScrolling = false;
+    
+    resultPanel.addEventListener("touchstart", function(e) {
+      touchStartY = e.touches[0].clientY;
+      isScrolling = false;
+    });
+
+    resultPanel.addEventListener("touchmove", function(e) {
+      touchEndY = e.touches[0].clientY;
+      isScrolling = true;
+    });
+
+    resultPanel.addEventListener("touchend", function(e) {
+      if (!isScrolling) {
+        const touchDiff = touchStartY - touchEndY;
+        if (touchDiff > 50 && resultPanel.classList.contains("open")) {
+          resultPanel.classList.remove("open");
+        }
+      }
+    });
+
+    const answerInput = document.getElementById("answer");
+    const checkButton = document.getElementById("checkButton");
+    function toggleCheckButton() {
+      if (answerInput.disabled) {
+        checkButton.disabled = true;
+      } else {
+        checkButton.disabled = (answerInput.value.trim() === "" || answerLocked);
+        if (!checkButton.disabled) {
+          checkButton.classList.remove("quiz-ended");
+        }
+      }
+    }
+    answerInput.addEventListener("input", toggleCheckButton);
+    toggleCheckButton();
+
+    answerInput.addEventListener("keydown", function(event) {
+      if (event.key === "Enter" && this.value.trim() !== "") {
+        checkAnswer();
+      }
+    });
+
+    window.onload = nextQuestion;
+  </script>
+</body>
+</html>

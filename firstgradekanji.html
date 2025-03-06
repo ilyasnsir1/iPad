@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>k1</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-image: url('https://images.unsplash.com/photo-1528164344705-47542687000d?q=80&w=2092&auto=format&fit=crop&ixlib=rb-4.0.3');
+      background-size: cover;
+      background-position: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      position: relative;
+    }
+    /* Anzeige des Kanji */
+    #kanji { font-size: 50px; margin: 20px; }
+    input, button { padding: 10px; font-size: 20px; margin-top: 10px; }
+    #message { margin-top: 20px; font-size: 20px; }
+    .glassyNumber {
+      background: rgba(0,0,0,0.5);
+      padding: 6px 8px;
+      border-radius: 8px;
+      backdrop-filter: blur(5px);
+      display: inline-block;
+      vertical-align: middle;
+    }
+    #score, #timer { margin-top: 20px; font-size: 20px; }
+    input {
+      border: 2px solid transparent;
+      outline: none;
+      transition: border 0.3s;
+    }
+    input:focus, input:hover { border: 2px solid black; }
+    .button-container { margin-top: 20px; display: flex; gap: 10px; }
+    #restart { display: none; }
+    .action-button {
+      background-color: rgba(255,255,255,0.7);
+      color: black;
+      border: none;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .action-button:not(:disabled):hover {
+      background-color: rgba(255,255,255,0.9);
+      transform: scale(1.05);
+    }
+    .action-button:disabled { opacity: 0.3; cursor: default; transform: none; }
+    .quiz-ended { background-color: rgba(255,255,255,0.3); color: #999; }
+    /* Ergebnis-Panel */
+    #resultPanel {
+      display: none;
+      position: fixed;
+      top: calc(-33% + 44px);
+      left: 0;
+      width: 100%;
+      height: 33%;
+      background: rgba(0,0,0,0.9);
+      color: white;
+      z-index: 1000;
+      padding: 20px;
+      transition: top 0.3s ease;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    #resultPanel.open {
+      top: 0;
+    }
+    /* Toggle-Button */
+    #togglePanel {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      cursor: pointer;
+      z-index: 1001;
+      width: 44px;
+      height: 44px;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #togglePanel svg {
+      width: 24px;
+      height: 24px;
+      stroke: white;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      transition: transform 0.2s;
+    }
+    #resultPanel.open #togglePanel svg { transform: rotate(180deg); }
+    /* Stil für falsche Antworten */
+    #wrongListContainer {
+      margin-top: 20px;
+      width: 400px;
+      max-height: calc(100% - 80px);
+      margin: 20px auto 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+    #wrongListContainer::-webkit-scrollbar { width: 8px; }
+    #wrongListContainer::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      margin: 20% 0;
+    }
+    #wrongListContainer::-webkit-scrollbar-thumb {
+      background: rgba(200,200,200,0.8);
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>First grade Kanji</h1>
+  <div id="kanji">?</div>
+  <input type="text" id="answer" placeholder="Antwort eingeben..." autocomplete="off">
+  <button id="checkButton" class="action-button" onclick="checkAnswer()">Überprüfen</button>
+  <div id="message"></div>
+  <div id="score">
+    Richtige Antworten:
+    <span id="answersValue" class="glassyNumber">0</span>
+    | Prozentsatz:
+    <span id="percentValue" class="glassyNumber">0.00%</span>
+  </div>
+  <div id="timer">
+    Zeit:
+    <span id="timeValue" class="glassyNumber">10:00</span>
+  </div>
+  <div class="button-container">
+    <button class="action-button" onclick="goBack()">Zurück</button>
+    <button id="restart" class="action-button" onclick="restartQuiz()">Wiederholen</button>
+  </div>
+
+  <!-- Ergebnis-Panel -->
+  <div id="resultPanel">
+    <div id="resultHeader">
+      <h2>Falsche Antworten</h2>
+    </div>
+    <div id="wrongListContainer">
+      <div id="wrongList"></div>
+    </div>
+    <div id="togglePanel">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    let answerLocked = false;
+    
+    function goBack() {
+      window.location.href = "willkommen.html";
+    }
+    function restartQuiz() {
+      location.reload();
+    }
+    
+    const kanjiMap = {
+      "一": ["eins", "ichi", "itsu"],
+      "二": ["zwei", "ni", "ji"],
+      "三": ["drei", "san"],
+      "四": ["vier", "yon"],
+      "五": ["fünf", "go"],
+      "六": ["sechs", "roku"],
+      "七": ["sieben", "shichi"],
+      "八": ["acht", "hachi"],
+      "九": ["neun", "ku", "kyū"],
+      "十": ["zehn", "jū"],
+      "百": ["hundert", "hyaku"],
+      "千": ["tausend", "sen"],
+      "上": ["oben", "jō"],
+      "下": ["unten", "ka", "ge"],
+      "左": ["links", "sa"],
+      "右": ["rechts", "u", "yū"],
+      "中": ["innen", "mitte", "chū", "jū"],
+      "大": ["groß", "dai", "tai"],
+      "小": ["klein", "shō"],
+      "月": ["monat", "mond", "gatsu", "getsu"],
+      "日": ["tag", "sonne", "nichi", "jitsu"],
+      "年": ["jahr", "nen"],
+      "早": ["früh", "schnell", "sō", "satsu"],
+      "木": ["baum", "holz", "moku", "boku"],
+      "林": ["hain", "forst", "rin"],
+      "山": ["berg", "san", "zan"],
+      "川": ["fluss", "sen"],
+      "土": ["erde", "do", "to"],
+      "空": ["himmel(himmel)", "kū"],
+      "田": ["reisfeld", "den"],
+      "天": ["himmel(paradies)", "heaven", "ten"],
+      "生": ["leben", "roh", "sei", "shō"],
+      "花": ["blume", "ka"],
+      "草": ["gras", "sō"],
+      "虫": ["insekt", "chū"],
+      "犬": ["hund", "ken"],
+      "人": ["person", "mensch", "jin", "nin"],
+      "名": ["name", "mei", "myō"],
+      "女": ["frau", "jo", "nyo"],
+      "男": ["mann", "dan", "nan"],
+      "子": ["kind", "shi", "su"],
+      "目": ["auge", "moku"],
+      "耳": ["ohr", "ji", "ni"],
+      "口": ["mund", "kō"],
+      "手": ["hand", "shu"],
+      "足": ["fuß", "soku"],
+      "見": ["sehen", "ken", "gen"],
+      "音": ["ton", "geräusch", "on"],
+      "力": ["kraft", "riki", "ryoku"],
+      "気": ["luft", "geist", "seele", "stimmung", "ki", "ke"],
+      "円": ["yen", "kreis", "en"],
+      "入": ["hineingehen", "nyū"],
+      "出": ["herauskommen", "shutsu"],
+      "立": ["aufstehen", "ritsu"],
+      "休": ["ausruhen", "kyū"],
+      "先": ["vorher", "vorne", "sen"],
+      "夕": ["abend", "seki"],
+      "本": ["buch", "ursprung", "hon"],
+      "文": ["text", "bun", "mon"],
+      "字": ["schriftzeichen", "ji"],
+      "学": ["lernen", "gaku"],
+      "校": ["schule", "kō"],
+      "村": ["dorf", "son"],
+      "町": ["stadt", "chō"],
+      "森": ["wald", "shin"],
+      "正": ["richtig", "gerecht", "sei", "shō"],
+      "水": ["wasser", "sui"],
+      "火": ["feuer", "ka"],
+      "玉": ["edelstein", "gyoku"],
+      "王": ["könig", "ō"],
+      "石": ["stein", "seki", "koku"],
+      "竹": ["bambus", "chiku"],
+      "糸": ["faden", "shi"],
+      "貝": ["muschel", "bai"],
+      "車": ["fahrzeug", "sha"],
+      "金": ["gold", "geld", "kin"],
+      "雨": ["regen", "u"],
+      "赤": ["rot", "seki"],
+      "青": ["blau", "sei", "shō"],
+      "白": ["weiß", "haku"]
+    };
+
+    let kanjiList = Object.keys(kanjiMap);
+    if (kanjiList.length === 0) {
+      alert("Fehler: Keine Kanji gefunden.");
+      window.location.href = "firstgradekanji.html";
+    }
+    
+    let currentKanji;
+    let correctAnswers = 0;
+    let totalAnswers = 0;
+    let timerStarted = false;
+    let timeLeft = 600;
+    let timerInterval;
+    let wrongResults = [];
+    
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timeValue").textContent = "00:00";
+          document.getElementById("answer").disabled = true;
+          document.getElementById("checkButton").disabled = true;
+          document.getElementById("checkButton").classList.add("quiz-ended");
+          checkEndQuiz();
+          return;
+        }
+        timeLeft--;
+        let minutes = Math.floor(timeLeft / 60);
+        let seconds = timeLeft % 60;
+        document.getElementById("timeValue").textContent =
+          `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    }
+    
+    function nextQuestion() {
+      if (kanjiList.length === 0) {
+        checkEndQuiz();
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * kanjiList.length);
+      currentKanji = kanjiList.splice(randomIndex, 1)[0];
+      document.getElementById("kanji").textContent = currentKanji;
+      document.getElementById("answer").value = "";
+      document.getElementById("message").textContent = "";
+      toggleCheckButton();
+    }
+    
+    function checkAnswer() {
+      if (answerLocked) return;
+      const userInputRaw = document.getElementById("answer").value;
+      if (userInputRaw.trim() === "") return;
+      answerLocked = true;
+    
+      const userInput = userInputRaw.trim().toLowerCase();
+      if (!timerStarted) {
+        timerStarted = true;
+        startTimer();
+      }
+      totalAnswers++;
+      if (kanjiMap[currentKanji].some(ans => ans.toLowerCase() === userInput)) {
+        document.getElementById("message").textContent = "Richtig! ✅";
+        correctAnswers++;
+      } else {
+        document.getElementById("message").textContent =
+          `Falsch! ❌ Richtige Antwort(en): ${kanjiMap[currentKanji].join(" / ")}`;
+        wrongResults.push({
+          question: currentKanji,
+          userAnswer: userInput,
+          correctAnswer: kanjiMap[currentKanji].join(" / ")
+        });
+      }
+      updateScore();
+      setTimeout(() => {
+        nextQuestion();
+        answerLocked = false;
+        toggleCheckButton();
+      }, 1000);
+    }
+    
+    function updateScore() {
+      let percentage = ((correctAnswers / totalAnswers) * 100).toFixed(2);
+      document.getElementById("answersValue").textContent = correctAnswers;
+      document.getElementById("percentValue").textContent = `${percentage}%`;
+    }
+    
+    function checkEndQuiz() {
+      document.getElementById("message").textContent = "Quiz beendet! Alle Kanji wurden abgefragt.";
+      document.getElementById("answer").disabled = true;
+      document.getElementById("checkButton").disabled = true;
+      document.getElementById("checkButton").classList.add("quiz-ended");
+      clearInterval(timerInterval);
+      document.getElementById("restart").style.display = "block";
+      if (wrongResults.length > 0) {
+        document.getElementById("resultPanel").style.display = "block";
+      }
+    }
+    
+    function updateWrongList() {
+      const wrongListDiv = document.getElementById("wrongList");
+      wrongListDiv.innerHTML = "";
+      if (wrongResults.length === 0) {
+        wrongListDiv.innerHTML = "<p>Keine falschen Antworten.</p>";
+        return;
+      }
+      wrongResults.forEach(item => {
+        const p = document.createElement("p");
+        p.innerHTML = `<strong>${item.question}</strong>: Deine Antwort: 
+        <span style="color: red;">${item.userAnswer}</span> | Richtig: 
+        <span style="color: green;">${item.correctAnswer}</span>`;
+        wrongListDiv.appendChild(p);
+      });
+    }
+    
+    const togglePanel = document.getElementById("togglePanel");
+    const resultPanel = document.getElementById("resultPanel");
+    
+    togglePanel.addEventListener("click", function(e) {
+      e.preventDefault();
+      if (!resultPanel.classList.contains("open")) {
+        updateWrongList();
+        resultPanel.classList.add("open");
+      } else {
+        resultPanel.classList.remove("open");
+      }
+    });
+
+    togglePanel.addEventListener("touchstart", function(e) {
+      e.preventDefault();
+      if (!resultPanel.classList.contains("open")) {
+        updateWrongList();
+        resultPanel.classList.add("open");
+      } else {
+        resultPanel.classList.remove("open");
+      }
+    });
+
+    // Verhindere das Schließen beim Scrollen
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let isScrolling = false;
+    
+    resultPanel.addEventListener("touchstart", function(e) {
+      touchStartY = e.touches[0].clientY;
+      isScrolling = false;
+    });
+
+    resultPanel.addEventListener("touchmove", function(e) {
+      touchEndY = e.touches[0].clientY;
+      isScrolling = true;
+    });
+
+    resultPanel.addEventListener("touchend", function(e) {
+      if (!isScrolling) {
+        const touchDiff = touchStartY - touchEndY;
+        if (touchDiff > 50 && resultPanel.classList.contains("open")) {
+          resultPanel.classList.remove("open");
+        }
+      }
+    });
+    
+    const answerInput = document.getElementById("answer");
+    const checkButton = document.getElementById("checkButton");
+    function toggleCheckButton() {
+      checkButton.disabled = (answerInput.value.trim() === "" || answerLocked);
+      if (!checkButton.disabled) {
+        checkButton.classList.remove("quiz-ended");
+      }
+    }
+    answerInput.addEventListener("input", toggleCheckButton);
+    answerInput.addEventListener("keydown", event => {
+      if (event.key === "Enter" && answerInput.value.trim() !== "") {
+        checkAnswer();
+      }
+    });
+    
+    window.onload = nextQuestion;
+  </script>
+</body>
+</html>

@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hiragana auswahl</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Grundlegende Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent; /* Entfernt den blauen Tap-Highlight auf iOS */
+    }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-image: url('https://images.unsplash.com/photo-1649583693539-f36f908da137?q=80&w=1931&auto=format&fit=crop&ixlib=rb-4.0.3');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      position: relative;
+      overflow-x: hidden;
+      padding: 20px;
+    }
+    /* Container & Auswahl */
+    .selection-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .selection {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 5px;
+      flex-wrap: wrap;
+    }
+    .column {
+      display: flex;
+      flex-direction: column;
+      min-width: 200px;
+      flex: 1;
+    }
+    label {
+      display: block;
+      margin: 5px;
+      font-size: 1em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 6px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    label:active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+    .selection-container h2 {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      transition: transform 0.5s ease-in-out;
+    }
+    /* Button-Container & Basis-Stile */
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 15px auto;
+      flex-wrap: wrap;
+    }
+    .btn-base {
+      text-align: center;
+      text-transform: uppercase;
+      transition: 0.3s;
+      color: rgb(253,252,252);
+      border-radius: 10px;
+      display: inline-block;
+      border: 0;
+      font-weight: 700;
+      background-color: transparent;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      overflow: hidden;
+      background-size: 200%;
+      padding: 10px 20px;
+      min-width: 180px;
+      font-size: 0.9em;
+    }
+    .btn-base:active {
+      transform: scale(0.95);
+    }
+    .btn-base .btn-content {
+      display: inline-block;
+      transition: opacity 0.5s, transform 0.5s;
+      opacity: 1;
+    }
+    .btn-base:hover .btn-content {
+      opacity: 0;
+    }
+    .btn-base::after {
+      content: attr(data-hover);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.5s;
+      white-space: nowrap;
+    }
+    .btn-base:hover::after {
+      opacity: 1;
+    }
+    .btn-select-all {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 8px 15px;
+      font-size: 0.9em;
+      z-index: 1002;
+    }
+    .btn-main-nav {
+      flex: 1;
+      margin: 10px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      background-image: linear-gradient(45deg, #080808 0%, #1a1a1a 51%, #080808 100%);
+    }
+    .btn-sidebar {
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px 15px;
+      font-size: 0.9em;
+    }
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100%;
+      background-color: rgba(0,0,0,0.95);
+      padding: 15px;
+      z-index: 1000;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+    #sidebar.open {
+      transform: translateX(0);
+    }
+    .sidebar-content {
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-content p {
+      margin: 10px 0;
+      font-size: 1.1em;
+    }
+    /* Toggle Button für Sidebar */
+    #toggleSidebar {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      color: white;
+      border-radius: 25px;
+      z-index: 1001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #toggleSidebar:active {
+      transform: scale(0.95);
+    }
+    /* Tabelle-Container & Seiten */
+    .table-container {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      height: 60vh;
+      display: flex;
+      align-items: flex-start;
+      min-width: 300px;
+    }
+    .table-page {
+      position: absolute;
+      width: 100%;
+      transition: transform 0.5s ease-in-out;
+      display: block;
+      top: 0;
+      left: 0;
+      transform: translateX(100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .table-page.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .table-page.prev {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    .table-page.prev-back {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    .table-page.active-back {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Seite 2: Scrollbare Fläche */
+    #page2-wrapper {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    #page2 {
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 15px;
+      padding-bottom: 20px;
+      width: 100%;
+      position: relative;
+      touch-action: pan-y;
+    }
+    #page2::-webkit-scrollbar {
+      display: none;
+    }
+    /* Benutzerdefinierter Scrollregler */
+    .custom-scrollbar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      height: 100%;
+      width: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 4px;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .custom-scrollbar .thumb {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 4px;
+      z-index: 101;
+      min-height: 30px;
+      pointer-events: none; /* Verhindert Interferenz mit dem Scrollen */
+    }
+    /* Tabellen & Überschriften */
+    .table-heading {
+      font-size: 1.1em;
+      margin: 15px 0 8px;
+      padding: 8px 0;
+      position: relative;
+      z-index: 1;
+    }
+    table {
+      width: 100%;
+      margin: 8px auto;
+      border-collapse: collapse;
+      color: white;
+      font-size: 0.9em;
+      position: relative;
+      z-index: 1;
+    }
+    th, td {
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      padding: 8px;
+      text-align: center;
+      line-height: 1.3;
+    }
+    th {
+      background-color: rgba(0,0,0,0.5);
+      font-size: 1em;
+    }
+    td {
+      vertical-align: middle;
+    }
+    /* Media Queries für iPad */
+    @media screen and (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      .selection-container {
+        padding: 10px;
+      }
+      .column {
+        min-width: 150px;
+      }
+      label {
+        font-size: 0.9em;
+        padding: 4px;
+      }
+      table {
+        font-size: 0.8em;
+      }
+      th, td {
+        padding: 6px;
+      }
+      .btn-base {
+        padding: 8px 16px;
+        min-width: 150px;
+      }
+      .table-container {
+        height: 50vh;
+      }
+    }
+    /* Navigation Button */
+    .btn-nav {
+      background: transparent;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 1.2em;
+      margin: 15px 0;
+      transition: all 0.3s ease;
+      min-width: 120px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    .btn-nav:hover {
+      transform: translateY(-2px);
+      text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    }
+    .btn-nav:active {
+      transform: translateY(0);
+    }
+    .navigation-buttons {
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Button "Alle auswählen/abwählen" -->
+  <button class="btn-select-all" onclick="toggleSelection()">Alle auswählen</button>
+  <div class="selection-container">
+    <h2>Wähle die Zeilen aus, die du gerne üben möchtest!</h2>
+    <div class="table-container">
+      <div class="table-page active" id="page1">
+        <div class="selection">
+          <div class="column">
+            <label><input type="checkbox" value="a"> (あ, い, う, え, お)</label>
+            <label><input type="checkbox" value="ka"> (か, き, く, け, こ)</label>
+            <label><input type="checkbox" value="sa"> (さ, し, す, せ, そ)</label>
+            <label><input type="checkbox" value="ta"> (た, ち, つ, て, と)</label>
+            <label><input type="checkbox" value="na"> (な, に, ぬ, ね, の)</label>
+            <label><input type="checkbox" value="ha"> (は, ひ, ふ, へ, ほ)</label>
+            <label><input type="checkbox" value="ma"> (ま, み, む, め, も)</label>
+            <label><input type="checkbox" value="ya"> (や, ゆ, よ)</label>
+            <label><input type="checkbox" value="ra"> (ら, り, る, れ, ろ)</label>
+            <label><input type="checkbox" value="wa"> (わ, を)</label>
+            <label><input type="checkbox" value="n"> (ん)</label>
+          </div>
+          <div class="column">
+            <label><input type="checkbox" value="ga"> (が, ぎ, ぐ, げ, ご)</label>
+            <label><input type="checkbox" value="za"> (ざ, じ, ず, ぜ, ぞ)</label>
+            <label><input type="checkbox" value="da"> (だ, ぢ, づ, で, ど)</label>
+            <label><input type="checkbox" value="ba"> (ば, び, ぶ, べ, ぼ)</label>
+            <label><input type="checkbox" value="pa"> (ぱ, ぴ, ぷ, ぺ, ぽ)</label>
+          </div>
+          <div class="column">
+            <label><input type="checkbox" value="kya"> (きゃ, きゅ, きょ)</label>
+            <label><input type="checkbox" value="sha"> (しゃ, しゅ, しょ)</label>
+            <label><input type="checkbox" value="cha"> (ちゃ, ちゅ, ちょ)</label>
+            <label><input type="checkbox" value="nya"> (にゃ, にゅ, にょ)</label>
+            <label><input type="checkbox" value="hya"> (ひゃ, ひゅ, ひょ)</label>
+            <label><input type="checkbox" value="mya"> (みゃ, みゅ, みょ)</label>
+            <label><input type="checkbox" value="rya"> (りゃ, りゅ, りょ)</label>
+            <label><input type="checkbox" value="gya"> (ぎゃ, ぎゅ, ぎょ)</label>
+            <label><input type="checkbox" value="ja"> (じゃ, じゅ, じょ)</label>
+            <label><input type="checkbox" value="dya"> (ぢゃ, ぢゅ, ぢょ)</label>
+            <label><input type="checkbox" value="bya"> (びゃ, びゅ, びょ)</label>
+            <label><input type="checkbox" value="pya"> (ぴゃ, ぴゅ, ぴょ)</label>
+          </div>
+        </div>
+      </div>
+      <!-- Seite 2: Scrollbare Fläche mit benutzerdefiniertem Scrollregler -->
+      <div class="table-page" id="page2-wrapper">
+        <div id="page2">
+          <div class="table-heading">Hiragana Grundzeichen</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Kategorie</th>
+                <th>Zeichen1</th>
+                <th>Zeichen2</th>
+                <th>Zeichen3</th>
+                <th>Zeichen4</th>
+                <th>Zeichen5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>あ</td>
+                <td>あ (a)</td>
+                <td>い (i)</td>
+                <td>う (u)</td>
+                <td>え (e)</td>
+                <td>お (o)</td>
+              </tr>
+              <tr>
+                <td>K-Reihe</td>
+                <td>か (ka)</td>
+                <td>き (ki)</td>
+                <td>く (ku)</td>
+                <td>け (ke)</td>
+                <td>こ (ko)</td>
+              </tr>
+              <tr>
+                <td>S-Reihe</td>
+                <td>さ (sa)</td>
+                <td>し (shi)</td>
+                <td>す (su)</td>
+                <td>せ (se)</td>
+                <td>そ (so)</td>
+              </tr>
+              <tr>
+                <td>T-Reihe</td>
+                <td>た (ta)</td>
+                <td>ち (chi)</td>
+                <td>つ (tsu)</td>
+                <td>て (te)</td>
+                <td>と (to)</td>
+              </tr>
+              <tr>
+                <td>N-Reihe</td>
+                <td>な (na)</td>
+                <td>に (ni)</td>
+                <td>ぬ (nu)</td>
+                <td>ね (ne)</td>
+                <td>の (no)</td>
+              </tr>
+              <tr>
+                <td>H-Reihe</td>
+                <td>は (ha)</td>
+                <td>ひ (hi)</td>
+                <td>ふ (fu)</td>
+                <td>へ (he)</td>
+                <td>ほ (ho)</td>
+              </tr>
+              <tr>
+                <td>M-Reihe</td>
+                <td>ま (ma)</td>
+                <td>み (mi)</td>
+                <td>む (mu)</td>
+                <td>め (me)</td>
+                <td>も (mo)</td>
+              </tr>
+              <tr>
+                <td>Y-Reihe</td>
+                <td>や (ya)</td>
+                <td></td>
+                <td>ゆ (yu)</td>
+                <td></td>
+                <td>よ (yo)</td>
+              </tr>
+              <tr>
+                <td>R-Reihe</td>
+                <td>ら (ra)</td>
+                <td>り (ri)</td>
+                <td>る (ru)</td>
+                <td>れ (re)</td>
+                <td>ろ (ro)</td>
+              </tr>
+              <tr>
+                <td>W-Reihe</td>
+                <td>わ (wa)</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>を (wo)</td>
+              </tr>
+              <tr>
+                <td>N-Laut</td>
+                <td>ん (n)</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="table-heading">Hiragana Mit Dakuten (G Bis P)</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Kategorie</th>
+                <th>Zeichen1</th>
+                <th>Zeichen2</th>
+                <th>Zeichen3</th>
+                <th>Zeichen4</th>
+                <th>Zeichen5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>G-Reihe</td>
+                <td>が (ga)</td>
+                <td>ぎ (gi)</td>
+                <td>ぐ (gu)</td>
+                <td>げ (ge)</td>
+                <td>ご (go)</td>
+              </tr>
+              <tr>
+                <td>Z-Reihe</td>
+                <td>ざ (za)</td>
+                <td>じ (ji)</td>
+                <td>ず (zu)</td>
+                <td>ぜ (ze)</td>
+                <td>ぞ (zo)</td>
+              </tr>
+              <tr>
+                <td>D-Reihe</td>
+                <td>だ (da)</td>
+                <td>ぢ (ji)</td>
+                <td>づ (zu)</td>
+                <td>で (de)</td>
+                <td>ど (do)</td>
+              </tr>
+              <tr>
+                <td>B-Reihe</td>
+                <td>ば (ba)</td>
+                <td>び (bi)</td>
+                <td>ぶ (bu)</td>
+                <td>べ (be)</td>
+                <td>ぼ (bo)</td>
+              </tr>
+              <tr>
+                <td>P-Reihe</td>
+                <td>ぱ (pa)</td>
+                <td>ぴ (pi)</td>
+                <td>ぷ (pu)</td>
+                <td>ぺ (pe)</td>
+                <td>ぽ (po)</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="table-heading">Hiragana Kombinationen</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Kategorie</th>
+                <th>Zeichen1</th>
+                <th>Zeichen3</th>
+                <th>Zeichen5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>K Kombination</td>
+                <td>きゃ (kya)</td>
+                <td>きゅ (kyu)</td>
+                <td>きょ (kyo)</td>
+              </tr>
+              <tr>
+                <td>S Kombination</td>
+                <td>しゃ (sha)</td>
+                <td>しゅ (shu)</td>
+                <td>しょ (sho)</td>
+              </tr>
+              <tr>
+                <td>T Kombination</td>
+                <td>ちゃ (cha)</td>
+                <td>ちゅ (chu)</td>
+                <td>ちょ (cho)</td>
+              </tr>
+              <tr>
+                <td>N Kombination</td>
+                <td>にゃ (nya)</td>
+                <td>にゅ (nyu)</td>
+                <td>にょ (nyo)</td>
+              </tr>
+              <tr>
+                <td>H Kombination</td>
+                <td>ひゃ (hya)</td>
+                <td>ひゅ (hyu)</td>
+                <td>ひょ (hyo)</td>
+              </tr>
+              <tr>
+                <td>M Kombination</td>
+                <td>みゃ (mya)</td>
+                <td>みゅ (myu)</td>
+                <td>みょ (myo)</td>
+              </tr>
+              <tr>
+                <td>R Kombination</td>
+                <td>りゃ (rya)</td>
+                <td>りゅ (ryu)</td>
+                <td>りょ (ryo)</td>
+              </tr>
+              <tr>
+                <td>G Kombination</td>
+                <td>ぎゃ (gya)</td>
+                <td>ぎゅ (gyu)</td>
+                <td>ぎょ (gyo)</td>
+              </tr>
+              <tr>
+                <td>Z Kombination</td>
+                <td>じゃ (ja)</td>
+                <td>じゅ (ju)</td>
+                <td>じょ (jo)</td>
+              </tr>
+              <tr>
+                <td>D Kombination</td>
+                <td>ぢゃ (ja)</td>
+                <td>ぢゅ (ju)</td>
+                <td>ぢょ (jo)</td>
+              </tr>
+              <tr>
+                <td>B Kombination</td>
+                <td>びゃ (bya)</td>
+                <td>びゅ (byu)</td>
+                <td>びょ (byo)</td>
+              </tr>
+              <tr>
+                <td>P Kombination</td>
+                <td>ぴゃ (pya)</td>
+                <td>ぴゅ (pyu)</td>
+                <td>ぴょ (pyo)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Benutzerdefinierter Scrollregler (rechts, vertikal zentriert) -->
+        <div class="custom-scrollbar">
+          <div class="thumb" id="customThumb"></div>
+        </div>
+      </div>
+    </div>
+    <div class="navigation-buttons">
+      <button class="btn-nav" onclick="changePage()">
+        <span class="btn-content">Weiter</span>
+      </button>
+    </div>
+  </div>
+  <div class="button-container">
+    <button class="btn-base btn-main-nav" data-hover="メインメニューに戻る" onclick="window.location.href='willkommen.html'">
+      <span class="btn-content">Zurück zum Hauptmenü</span>
+    </button>
+    <button class="btn-base btn-main-nav" data-hover="クイズを開始" onclick="startQuiz()">
+      <span class="btn-content">Quiz starten</span>
+    </button>
+  </div>
+  <div id="sidebar">
+    <div class="sidebar-content">
+      <p>Hier findest du weitere</p>
+      <p>Übungen:</p>
+      <a href="katakana.html" class="btn-base btn-sidebar" data-hover="カタカナ" role="button">
+        <span class="btn-content">Katakana</span>
+      </a>
+      <a href="firstgradekanji.html" class="btn-base btn-sidebar" data-hover="小学一年生の漢字" role="button">
+        <span class="btn-content">1st grade K</span>
+      </a>
+    </div>
+    <button id="toggleSidebar"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+  <script>
+    function startQuiz() {
+      const selectedLines = [];
+      document.querySelectorAll('input[type=checkbox]:checked').forEach(cb => selectedLines.push(cb.value));
+      if (selectedLines.length === 0) {
+        alert("Ya Manyak, mach deine Augen auf. Wähle mindestens eine Zeile aus...");
+        return;
+      }
+      localStorage.setItem("selectedHiraganaLines", JSON.stringify(selectedLines));
+      window.location.href = "hiraganaquiz.html";
+    }
+    function toggleSelection() {
+      const checkboxes = document.querySelectorAll('#page1 input[type=checkbox]');
+      const button = document.querySelector('.btn-select-all');
+      const allChecked = [...checkboxes].every(cb => cb.checked);
+      checkboxes.forEach(cb => cb.checked = !allChecked);
+      button.textContent = allChecked ? "Alle auswählen" : "Alle abwählen";
+    }
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    function toggleSidebar() {
+      sidebar.classList.toggle('open');
+      toggleBtn.innerHTML = sidebar.classList.contains('open') ? 
+        '<i class="fa-solid fa-times"></i>' : 
+        '<i class="fa-solid fa-bars"></i>';
+    }
+    toggleBtn.addEventListener('click', toggleSidebar);
+    document.addEventListener('click', function(e) {
+      if (!sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+        sidebar.classList.remove('open');
+        toggleBtn.innerHTML = '<i class="fa-solid fa-bars"></i>';
+      }
+    });
+    let isDraggingThumb = false;
+    let startY;
+    let startTop;
+    const thumb = document.getElementById('customThumb');
+    const scrollbar = document.querySelector('.custom-scrollbar');
+    const page2 = document.getElementById('page2');
+    
+    // Verbesserte Scrollbar-Logik für Touch
+    thumb.addEventListener('touchstart', function(e) {
+      isDraggingThumb = true;
+      startY = e.touches[0].clientY;
+      startTop = parseInt(thumb.style.top) || 0;
+    });
+    
+    document.addEventListener('touchmove', function(e) {
+      if (!isDraggingThumb) return;
+      e.preventDefault();
+      const currentY = e.touches[0].clientY;
+      const deltaY = currentY - startY;
+      const newTop = Math.max(0, Math.min(startTop + deltaY, scrollbar.clientHeight - thumb.clientHeight));
+      thumb.style.top = newTop + 'px';
+      const scrollRatio = newTop / (scrollbar.clientHeight - thumb.clientHeight);
+      const maxScroll = page2.scrollHeight - page2.clientHeight;
+      page2.scrollTop = scrollRatio * maxScroll;
+    });
+    
+    document.addEventListener('touchend', function() {
+      isDraggingThumb = false;
+    });
+    
+    function updateThumb() {
+      const visibleHeight = page2.clientHeight;
+      const contentHeight = page2.scrollHeight;
+      const scrollTop = page2.scrollTop;
+      const thumbHeight = Math.max((visibleHeight / contentHeight) * scrollbar.clientHeight, 20);
+      thumb.style.height = thumbHeight + 'px';
+      const maxThumbTop = scrollbar.clientHeight - thumbHeight;
+      const thumbTop = (scrollTop / (contentHeight - visibleHeight)) * maxThumbTop;
+      thumb.style.top = thumbTop + 'px';
+    }
+    
+    page2.addEventListener('scroll', updateThumb);
+    window.addEventListener('resize', updateThumb);
+    updateThumb();
+    
+    function changePage() {
+      const pages = document.querySelectorAll('.table-page');
+      const currentPage = document.querySelector('.table-page.active, .table-page.active-back');
+      const currentIndex = Array.from(pages).indexOf(currentPage);
+      const button = document.querySelector('.btn-nav');
+      const buttonContent = button.querySelector('.btn-content');
+      const selectAllButton = document.querySelector('.btn-select-all');
+      const heading = document.querySelector('.selection-container h2');
+      
+      if (currentIndex === 0) {
+        // Vorwärts zur zweiten Seite
+        currentPage.classList.remove('active', 'active-back');
+        currentPage.classList.add('prev');
+        pages[1].classList.remove('prev', 'prev-back');
+        pages[1].classList.add('active');
+        buttonContent.textContent = 'Zurück';
+        button.setAttribute('data-hover', 'Zurück');
+        selectAllButton.style.display = 'none';
+        heading.textContent = 'Hier kannst du die Hiragana auswendig lernen!';
+        heading.style.transform = 'translateX(0)';
+      } else {
+        // Zurück zur ersten Seite
+        currentPage.classList.remove('active', 'active-back');
+        currentPage.classList.add('prev-back');
+        pages[0].classList.remove('prev', 'prev-back');
+        pages[0].classList.add('active-back');
+        buttonContent.textContent = 'Weiter';
+        button.setAttribute('data-hover', 'Weiter');
+        selectAllButton.style.display = 'block';
+        heading.textContent = 'Wähle die Zeilen aus, die du gerne üben möchtest!';
+        heading.style.transform = 'translateX(0)';
+        
+        // Setze den Scroll-Position der zweiten Seite zurück
+        if (page2) {
+          page2.scrollTop = 0;
+          updateThumb();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
