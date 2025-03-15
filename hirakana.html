@@ -21,7 +21,7 @@
       color: #fff;
       position: relative;
     }
-    /* Das angezeigte Zeichen */
+    /* Das angezeigte Zeichen (egal ob Hiragana oder Katakana) */
     #hiragana {
       font-size: 50px;
       margin: 20px;
@@ -187,8 +187,8 @@
 
   <script>
     let answerLocked = false;
-    // Zum Zurückkehren (anpassen falls nötig)
-    function goBack() { window.location.href = "hiragana.html"; }
+    // Der Zurück-Button leitet jetzt zu willkommen.html weiter
+    function goBack() { window.location.href = "willkommen.html"; }
     function restartQuiz() { location.reload(); }
 
     // Kombiniertes Mapping für Hiragana und Katakana
@@ -253,7 +253,7 @@
       "ピャ": "pya", "ピュ": "pyu", "ピョ": "pyo"
     };
 
-    // Gruppenobjekt – hier werden ALLE Zeichen (Hiragana & Katakana) pro Gruppe definiert
+    // Gruppenobjekt – enthält ALLE Zeichen (Hiragana & Katakana)
     const kanaGroups = {
       "a": ["あ", "い", "う", "え", "お", "ア", "イ", "ウ", "エ", "オ"],
       "ka": ["か", "き", "く", "け", "こ", "カ", "キ", "ク", "ケ", "コ"],
@@ -317,8 +317,7 @@
       }, 1000);
     }
 
-    // Wählt ein zufälliges Zeichen aus der (durchlaufbaren) Liste und entfernt es,
-    // sodass jedes Zeichen genau einmal abgefragt wird.
+    // Wählt ein zufälliges Zeichen aus der Liste aus und entfernt es, sodass jedes Zeichen genau einmal abgefragt wird.
     function nextQuestion() {
       if (kanaList.length === 0) {
         checkEndQuiz();
@@ -399,7 +398,6 @@
       });
     }
 
-    // Toggle-Button für das Ergebnis-Panel
     const togglePanel = document.getElementById("togglePanel");
     const resultPanel = document.getElementById("resultPanel");
     togglePanel.addEventListener("click", function(e) {
