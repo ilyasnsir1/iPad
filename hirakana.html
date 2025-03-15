@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Hiragana &amp; Katakana Quiz</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box;
+    }
     body {
       font-family: Arial, sans-serif;
       text-align: center;
@@ -18,10 +22,10 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: #fff;
+      color: rgb(255, 255, 255);
       position: relative;
     }
-    /* Das angezeigte Zeichen (egal ob Hiragana oder Katakana) */
+    /* Das abgefragte Zeichen ist nun nicht mehr verschoben */
     #hiragana {
       font-size: 50px;
       margin: 20px;
@@ -31,9 +35,12 @@
       font-size: 20px;
       margin-top: 10px;
     }
-    #message { margin-top: 20px; font-size: 20px; }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+    }
     .glassyNumber {
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       padding: 6px 8px;
       border-radius: 8px;
       backdrop-filter: blur(5px);
@@ -41,7 +48,10 @@
       display: inline-block;
       vertical-align: middle;
     }
-    #score, #timer { margin-top: 20px; font-size: 20px; }
+    #score, #timer {
+      margin-top: 20px;
+      font-size: 20px;
+    }
     input {
       padding: 10px;
       font-size: 20px;
@@ -50,16 +60,25 @@
       outline: none;
       transition: border 0.3s;
     }
-    input:focus, input:hover { border: 2px solid black; }
-    input:disabled, input:disabled:hover { border: 2px solid transparent; cursor: default; }
+    input:focus,
+    input:hover {
+      border: 2px solid black;
+    }
+    input:disabled,
+    input:disabled:hover {
+      border: 2px solid transparent;
+      cursor: default;
+    }
     .button-container {
       margin-top: 20px;
       display: flex;
       gap: 10px;
     }
-    #restart { display: none; }
+    #restart {
+      display: none; 
+    }
     .action-button {
-      background-color: rgba(255,255,255,0.7);
+      background-color: rgba(255, 255, 255, 0.7);
       color: black;
       border: none;
       padding: 10px;
@@ -69,24 +88,26 @@
       transition: background-color 0.3s, transform 0.3s;
     }
     .action-button:not(:disabled):hover {
-      background-color: rgba(255,255,255,0.9);
+      background-color: rgba(255, 255, 255, 0.9);
       transform: scale(1.05);
     }
-    .action-button:disabled, .action-button:disabled:hover {
+    .action-button:disabled,
+    .action-button:disabled:hover {
       opacity: 0.3;
       cursor: default;
       transform: none;
     }
     .action-button.quiz-ended,
     .action-button.quiz-ended:hover {
-      background-color: rgba(255,255,255,0.3);
+      background-color: rgba(255, 255, 255, 0.3);
       border: 2px solid transparent;
       color: #999;
       cursor: default;
       transform: none;
       opacity: 1;
     }
-    /* Ergebnis-Panel */
+    /* Ergebnis-Panel: Wird nur eingeblendet, wenn die Runde beendet ist und Fehler vorliegen.
+       Im geschlossenen Zustand ragt es ca. 44px (Fingerbreite) heraus. */
     #resultPanel {
       display: none;
       position: fixed;
@@ -102,7 +123,11 @@
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
     }
-    #resultPanel.open { top: 0; }
+    /* Offener Zustand */
+    #resultPanel.open {
+      top: 0;
+    }
+    /* Toggle-Button (Chevron) – innerhalb des Panels, am unteren Rand verankert */
     #togglePanel {
       position: absolute;
       bottom: 0;
@@ -112,6 +137,7 @@
       z-index: 1001;
       width: 44px;
       height: 44px;
+      touch-action: manipulation;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -126,7 +152,10 @@
       fill: none;
       transition: transform 0.2s;
     }
-    #resultPanel.open #togglePanel svg { transform: rotate(180deg); }
+    /* Dreht den Chevron, wenn das Panel offen ist */
+    #resultPanel.open #togglePanel svg {
+      transform: rotate(180deg);
+    }
     /* Stil für die Liste falscher Antworten */
     #wrongListContainer {
       margin-top: 20px;
@@ -137,7 +166,9 @@
       -webkit-overflow-scrolling: touch;
       touch-action: pan-y;
     }
-    #wrongListContainer::-webkit-scrollbar { width: 8px; }
+    #wrongListContainer::-webkit-scrollbar {
+      width: 8px;
+    }
     #wrongListContainer::-webkit-scrollbar-track {
       background: rgba(255,255,255,0.1);
       margin-top: 20%;
@@ -150,7 +181,7 @@
   </style>
 </head>
 <body>
-  <h1>Hiragana &amp; Katakana</h1>
+  <h1>Hiragana &amp; Katakana Quiz</h1>
   <div id="hiragana">?</div>
   <input type="text" id="answer" placeholder="Antwort eingeben..." autocomplete="off">
   <button id="checkButton" class="action-button" onclick="checkAnswer()">Überprüfen</button>
@@ -178,6 +209,7 @@
     <div id="wrongListContainer">
       <div id="wrongList"></div>
     </div>
+    <!-- Der Chevron befindet sich am unteren Rand des Panels -->
     <div id="togglePanel">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <polyline points="6 9 12 15 18 9"/>
@@ -187,13 +219,16 @@
 
   <script>
     let answerLocked = false;
-    // Der Zurück-Button leitet jetzt zu willkommen.html weiter
-    function goBack() { window.location.href = "willkommen.html"; }
-    function restartQuiz() { location.reload(); }
+    
+    function goBack() {
+      window.location.href = "hiragana.html";
+    }
+    function restartQuiz() {
+      location.reload();
+    }
 
-    // Kombiniertes Mapping für Hiragana und Katakana
-    const kanaMap = {
-      // Hiragana
+    // Bestehende Hiragana-Daten
+    const hiraganaMap = {
       "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
       "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
       "さ": "sa", "し": "shi", "す": "su", "せ": "se", "そ": "so",
@@ -221,8 +256,11 @@
       "じゃ": "ja", "じゅ": "ju", "じょ": "jo",
       "ぢゃ": "ja", "ぢゅ": "ju", "ぢょ": "jo",
       "びゃ": "bya", "びゅ": "byu", "びょ": "byo",
-      "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo",
-      // Katakana
+      "ぴゃ": "pya", "ぴゅ": "pyu", "ぴょ": "pyo"
+    };
+
+    // Neue Katakana-Daten
+    const katakanaMap = {
       "ア": "a", "イ": "i", "ウ": "u", "エ": "e", "オ": "o",
       "カ": "ka", "キ": "ki", "ク": "ku", "ケ": "ke", "コ": "ko",
       "サ": "sa", "シ": "shi", "ス": "su", "セ": "se", "ソ": "so",
@@ -253,49 +291,96 @@
       "ピャ": "pya", "ピュ": "pyu", "ピョ": "pyo"
     };
 
-    // Gruppenobjekt – enthält ALLE Zeichen (Hiragana & Katakana)
-    const kanaGroups = {
-      "a": ["あ", "い", "う", "え", "お", "ア", "イ", "ウ", "エ", "オ"],
-      "ka": ["か", "き", "く", "け", "こ", "カ", "キ", "ク", "ケ", "コ"],
-      "sa": ["さ", "し", "す", "せ", "そ", "サ", "シ", "ス", "セ", "ソ"],
-      "ta": ["た", "ち", "つ", "て", "と", "タ", "チ", "ツ", "テ", "ト"],
-      "na": ["な", "に", "ぬ", "ね", "の", "ナ", "ニ", "ヌ", "ネ", "ノ"],
-      "ha": ["は", "ひ", "ふ", "へ", "ほ", "ハ", "ヒ", "フ", "ヘ", "ホ"],
-      "ma": ["ま", "み", "む", "め", "も", "マ", "ミ", "ム", "メ", "モ"],
-      "ya": ["や", "ゆ", "よ", "ヤ", "ユ", "ヨ"],
-      "ra": ["ら", "り", "る", "れ", "ろ", "ラ", "リ", "ル", "レ", "ロ"],
-      "wa": ["わ", "を", "ワ", "ヲ"],
-      "n": ["ん", "ン"],
-      "ga": ["が", "ぎ", "ぐ", "げ", "ご", "ガ", "ギ", "グ", "ゲ", "ゴ"],
-      "za": ["ざ", "じ", "ず", "ぜ", "ぞ", "ザ", "ジ", "ズ", "ゼ", "ゾ"],
-      "da": ["だ", "ぢ", "づ", "で", "ど", "ダ", "ヂ", "ヅ", "デ", "ド"],
-      "ba": ["ば", "び", "ぶ", "べ", "ぼ", "バ", "ビ", "ブ", "ベ", "ボ"],
-      "pa": ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ", "パ", "ピ", "プ", "ペ", "ポ"],
-      "kya": ["きゃ", "きゅ", "きょ", "キャ", "キュ", "キョ"],
-      "sha": ["しゃ", "しゅ", "しょ", "シャ", "シュ", "ショ"],
-      "cha": ["ちゃ", "ちゅ", "ちょ", "チャ", "チュ", "チョ"],
-      "nya": ["にゃ", "にゅ", "にょ", "ニャ", "ニュ", "ニョ"],
-      "hya": ["ひゃ", "ひゅ", "ひょ", "ヒャ", "ヒュ", "ヒョ"],
-      "mya": ["みゃ", "みゅ", "みょ", "ミャ", "ミュ", "ミョ"],
-      "rya": ["りゃ", "りゅ", "りょ", "リャ", "リュ", "リョ"],
-      "gya": ["ぎゃ", "ぎゅ", "ぎょ", "ギャ", "ギュ", "ギョ"],
-      "ja": ["じゃ", "じゅ", "じょ", "ジャ", "ジュ", "ジョ"],
-      "dya": ["ぢゃ", "ぢゅ", "ぢょ", "ヂャ", "ヂュ", "ヂョ"],
-      "bya": ["びゃ", "びゅ", "びょ", "ビャ", "ビュ", "ビョ"],
-      "pya": ["ぴゃ", "ぴゅ", "ぴょ", "ピャ", "ピュ", "ピョ"]
+    // Gemeinsame Daten für Hiragana & Katakana
+    const kanaMap = Object.assign({}, hiraganaMap, katakanaMap);
+
+    // Bestehende Hiragana-Gruppen
+    const hiraganaGroups = {
+      "a": ["あ", "い", "う", "え", "お"],
+      "ka": ["か", "き", "く", "け", "こ"],
+      "sa": ["さ", "し", "す", "せ", "そ"],
+      "ta": ["た", "ち", "つ", "て", "と"],
+      "na": ["な", "に", "ぬ", "ね", "の"],
+      "ha": ["は", "ひ", "ふ", "へ", "ほ"],
+      "ma": ["ま", "み", "む", "め", "も"],
+      "ya": ["や", "ゆ", "よ"],
+      "ra": ["ら", "り", "る", "れ", "ろ"],
+      "wa": ["わ", "を"],
+      "n": ["ん"],
+      "ga": ["が", "ぎ", "ぐ", "げ", "ご"],
+      "za": ["ざ", "じ", "ず", "ぜ", "ぞ"],
+      "da": ["だ", "ぢ", "づ", "で", "ど"],
+      "ba": ["ば", "び", "ぶ", "べ", "ぼ"],
+      "pa": ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"],
+      "kya": ["きゃ", "きゅ", "きょ"],
+      "sha": ["しゃ", "しゅ", "しょ"],
+      "cha": ["ちゃ", "ちゅ", "ちょ"],
+      "nya": ["にゃ", "にゅ", "にょ"],
+      "hya": ["ひゃ", "ひゅ", "ひょ"],
+      "mya": ["みゃ", "みゅ", "みょ"],
+      "rya": ["りゃ", "りゅ", "りょ"],
+      "gya": ["ぎゃ", "ぎゅ", "ぎょ"],
+      "ja": ["じゃ", "じゅ", "じょ"],
+      "dya": ["ぢゃ", "ぢゅ", "ぢょ"],
+      "bya": ["びゃ", "びゅ", "びょ"],
+      "pya": ["ぴゃ", "ぴゅ", "ぴょ"]
     };
 
-    // Erstelle die vollständige Liste aller Kana
+    // Neue Katakana-Gruppen
+    const katakanaGroups = {
+      "a": ["ア", "イ", "ウ", "エ", "オ"],
+      "ka": ["カ", "キ", "ク", "ケ", "コ"],
+      "sa": ["サ", "シ", "ス", "セ", "ソ"],
+      "ta": ["タ", "チ", "ツ", "テ", "ト"],
+      "na": ["ナ", "ニ", "ヌ", "ネ", "ノ"],
+      "ha": ["ハ", "ヒ", "フ", "ヘ", "ホ"],
+      "ma": ["マ", "ミ", "ム", "メ", "モ"],
+      "ya": ["ヤ", "ユ", "ヨ"],
+      "ra": ["ラ", "リ", "ル", "レ", "ロ"],
+      "wa": ["ワ", "ヲ"],
+      "n": ["ン"],
+      "ga": ["ガ", "ギ", "グ", "ゲ", "ゴ"],
+      "za": ["ザ", "ジ", "ズ", "ゼ", "ゾ"],
+      "da": ["ダ", "ヂ", "ヅ", "デ", "ド"],
+      "ba": ["バ", "ビ", "ブ", "ベ", "ボ"],
+      "pa": ["パ", "ピ", "プ", "ペ", "ポ"],
+      "kya": ["キャ", "キュ", "キョ"],
+      "sha": ["シャ", "シュ", "ショ"],
+      "cha": ["チャ", "チュ", "チョ"],
+      "nya": ["ニャ", "ニュ", "ニョ"],
+      "hya": ["ヒャ", "ヒュ", "ヒョ"],
+      "mya": ["ミャ", "ミュ", "ミョ"],
+      "rya": ["リャ", "リュ", "リョ"],
+      "gya": ["ギャ", "ギュ", "ギョ"],
+      "ja": ["ジャ", "ジュ", "ジョ"],
+      "dya": ["ヂャ", "ヂュ", "ヂョ"],
+      "bya": ["ビャ", "ビュ", "ビョ"],
+      "pya": ["ピャ", "ピュ", "ピョ"]
+    };
+
+    // Zusammenführen der beiden Gruppen in eine gemeinsame Liste
     let kanaList = [];
-    for (const group in kanaGroups) {
-      kanaList = kanaList.concat(kanaGroups[group]);
+    let selectedHiraganaLines = JSON.parse(localStorage.getItem("selectedHiraganaLines")) || [];
+    selectedHiraganaLines.forEach(line => {
+      if (hiraganaGroups[line]) {
+        kanaList = kanaList.concat(hiraganaGroups[line]);
+      }
+      if (katakanaGroups[line]) {
+        kanaList = kanaList.concat(katakanaGroups[line]);
+      }
+    });
+    if (kanaList.length === 0) {
+      alert("Fehler: Keine passenden Kana gefunden. Bitte Auswahl überprüfen.");
+      window.location.href = "hiragana.html";
     }
 
-    let correctAnswers = 0, totalAnswers = 0;
-    let timerStarted = false, timeLeft = 600, timerInterval;
+    let correctAnswers = 0;
+    let totalAnswers = 0;
+    let timerStarted = false;
+    let timeLeft = 600;
+    let timerInterval;
     let wrongResults = [];
-    let currentKana = "";
-    let answerLocked = false;
+    let currentKana;
 
     function startTimer() {
       timerInterval = setInterval(() => {
@@ -317,7 +402,6 @@
       }, 1000);
     }
 
-    // Wählt ein zufälliges Zeichen aus der Liste aus und entfernt es, sodass jedes Zeichen genau einmal abgefragt wird.
     function nextQuestion() {
       if (kanaList.length === 0) {
         checkEndQuiz();
@@ -336,6 +420,7 @@
       const userInputRaw = document.getElementById("answer").value;
       if (userInputRaw.trim() === "") return;
       answerLocked = true;
+
       const userInput = userInputRaw.trim().toLowerCase();
       if (!timerStarted) {
         timerStarted = true;
@@ -346,7 +431,7 @@
         document.getElementById("message").textContent = "Good Boy! ✅";
         correctAnswers++;
       } else {
-        document.getElementById("message").textContent =
+        document.getElementById("message").textContent = 
           `Falsch, du Ayri! ❌ Richtige Antwort: ${kanaMap[currentKana]}`;
         wrongResults.push({
           question: currentKana,
@@ -369,15 +454,16 @@
     }
 
     function checkEndQuiz() {
-      document.getElementById("message").textContent =
-        "Quiz beendet! Alle Hiragana &amp; Katakana wurden abgefragt.";
+      document.getElementById("message").textContent = 
+        "Quiz beendet! Alle Kana wurden abgefragt.";
       document.getElementById("answer").disabled = true;
       const btn = document.getElementById("checkButton");
       btn.disabled = true;
       btn.classList.add("quiz-ended");
       clearInterval(timerInterval);
       document.getElementById("restart").style.display = "block";
-      if (wrongResults.length > 0) {
+      // Zeige das Ergebnis-Panel nur, wenn es Fehler gab
+      if(wrongResults.length > 0){
         document.getElementById("resultPanel").style.display = "block";
       }
     }
@@ -398,8 +484,10 @@
       });
     }
 
+    // Ersetze die Touch-Event-Listener
     const togglePanel = document.getElementById("togglePanel");
     const resultPanel = document.getElementById("resultPanel");
+    
     togglePanel.addEventListener("click", function(e) {
       e.preventDefault();
       if (!resultPanel.classList.contains("open")) {
@@ -409,6 +497,7 @@
         resultPanel.classList.remove("open");
       }
     });
+
     togglePanel.addEventListener("touchstart", function(e) {
       e.preventDefault();
       if (!resultPanel.classList.contains("open")) {
@@ -416,6 +505,30 @@
         resultPanel.classList.add("open");
       } else {
         resultPanel.classList.remove("open");
+      }
+    });
+
+    // Verhindere das Schließen beim Scrollen
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let isScrolling = false;
+    
+    resultPanel.addEventListener("touchstart", function(e) {
+      touchStartY = e.touches[0].clientY;
+      isScrolling = false;
+    });
+
+    resultPanel.addEventListener("touchmove", function(e) {
+      touchEndY = e.touches[0].clientY;
+      isScrolling = true;
+    });
+
+    resultPanel.addEventListener("touchend", function(e) {
+      if (!isScrolling) {
+        const touchDiff = touchStartY - touchEndY;
+        if (touchDiff > 50 && resultPanel.classList.contains("open")) {
+          resultPanel.classList.remove("open");
+        }
       }
     });
 
