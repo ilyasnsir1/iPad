@@ -50,16 +50,18 @@
     }
     /* Button-Container mit Grid und Scroll */
     .button-container {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(100px, 1fr));
-      gap: 20px;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
       margin: 20px auto;
-      padding: 10px;
-      max-height: 40vh;
+      padding: 20px;
+      max-height: 60vh;
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
-      justify-items: center;
-      align-items: start;
+      width: 100%;
       max-width: 800px;
     }
     
@@ -79,8 +81,8 @@
     }
     
     .button-87-translation {
-      margin: 5px;
-      padding: 15px 20px;
+      margin: 0;
+      padding: 15px 30px;
       text-align: center;
       text-transform: uppercase;
       transition: 0.5s;
@@ -98,8 +100,7 @@
       position: relative;
       overflow: hidden;
       text-shadow: none;
-      width: 100%;
-      max-width: 180px;
+      width: 180px;
       text-decoration: none;
     }
     
@@ -139,27 +140,52 @@
       opacity: 1;
     }
     
-    /* Responsive Design */
-    @media (max-width: 768px) {
+    /* Portrait Mode (Vertikal) */
+    @media screen and (orientation: portrait) {
       .button-container {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-        padding: 10px 5px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
       }
       
       .button-87-translation {
-        padding: 12px 15px;
-        font-size: 14px;
+        width: calc(33.33% - 20px);
+        min-width: 150px;
+        max-width: 180px;
+      }
+      
+      .button-87-translation:nth-child(4) {
+        margin-top: 10px;
       }
     }
     
-    @media (max-width: 480px) {
+    /* Landscape Mode (Horizontal) */
+    @media screen and (orientation: landscape) {
       .button-container {
-        grid-template-columns: 1fr;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 30px;
       }
       
       .button-87-translation {
-        max-width: 200px;
+        width: 180px;
+      }
+    }
+    
+    /* Kleine Bildschirme */
+    @media screen and (max-width: 600px) {
+      .button-container {
+        gap: 20px;
+        padding: 15px;
+      }
+      
+      .button-87-translation {
+        width: calc(50% - 15px);
+        min-width: 140px;
+        padding: 12px 20px;
+        font-size: 14px;
       }
     }
     
@@ -419,3 +445,4 @@
   </script>
 </body>
 </html>
+
