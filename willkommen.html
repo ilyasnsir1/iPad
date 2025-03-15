@@ -48,15 +48,16 @@
       color: rgba(255,255,255,0.8);
       z-index: 10;
     }
-    /* Button-Container mit Scroll */
+    /* Button-Container mit Grid und Scroll */
     .button-container {
       display: flex;
+      flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
       gap: 30px;
       margin: 20px auto;
       padding: 20px;
-      max-height: 300px;
+      max-height: 60vh;
       overflow-y: auto;
       overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
@@ -81,7 +82,7 @@
     
     .button-87-translation {
       margin: 0;
-      padding: 15px 20px;
+      padding: 15px 30px;
       text-align: center;
       text-transform: uppercase;
       transition: 0.5s;
@@ -99,7 +100,7 @@
       position: relative;
       overflow: hidden;
       text-shadow: none;
-      width: 100px;
+      width: 180px;
       text-decoration: none;
     }
     
@@ -142,16 +143,20 @@
     /* Portrait Mode (Vertikal) */
     @media screen and (orientation: portrait) {
       .button-container {
-        display: grid;
-        grid-template-rows: auto auto;
-        grid-template-columns: repeat(2, 100px);
-        gap: 30px;
+        flex-direction: row;
+        flex-wrap: wrap;
         justify-content: center;
-        align-items: center;
+        gap: 30px;
       }
       
       .button-87-translation {
-        width: 100px;
+        width: calc(33.33% - 20px);
+        min-width: 150px;
+        max-width: 180px;
+      }
+      
+      .button-87-translation:nth-child(4) {
+        margin-top: 10px;
       }
     }
     
@@ -162,22 +167,23 @@
         flex-wrap: nowrap;
         justify-content: center;
         gap: 30px;
-        height: auto;
-        overflow: visible;
       }
       
       .button-87-translation {
-        width: 100px;
+        width: 180px;
       }
     }
     
     /* Kleine Bildschirme */
     @media screen and (max-width: 600px) {
       .button-container {
+        gap: 20px;
         padding: 15px;
       }
       
       .button-87-translation {
+        width: calc(50% - 15px);
+        min-width: 140px;
         padding: 12px 20px;
         font-size: 14px;
       }
@@ -439,5 +445,4 @@
   </script>
 </body>
 </html>
-
 
