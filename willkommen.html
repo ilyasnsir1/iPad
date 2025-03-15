@@ -48,40 +48,15 @@
       color: rgba(255,255,255,0.8);
       z-index: 10;
     }
-    /* Button-Container mit Grid und Scroll */
+    /* Button-Container */
     .button-container {
       display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
       justify-content: center;
       gap: 30px;
-      margin: 20px auto;
-      padding: 20px;
-      max-height: 60vh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      width: 100%;
-      max-width: 800px;
+      margin-top: 20px;
     }
-    
-    /* Scrollbar Styling */
-    .button-container::-webkit-scrollbar {
-      width: 8px;
-    }
-    
-    .button-container::-webkit-scrollbar-track {
-      background: rgba(255,255,255,0.1);
-      border-radius: 4px;
-    }
-    
-    .button-container::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.3);
-      border-radius: 4px;
-    }
-    
     .button-87-translation {
-      margin: 0;
+      margin: 10px;
       padding: 15px 30px;
       text-align: center;
       text-transform: uppercase;
@@ -100,28 +75,24 @@
       position: relative;
       overflow: hidden;
       text-shadow: none;
-      width: 180px;
+      min-width: 120px;
       text-decoration: none;
     }
-    
     .button-87-translation:hover {
       background-position: right center;
+      text-decoration: none;
     }
-    
     .button-87-translation:active {
       transform: scale(0.95);
     }
-    
     .button-87-translation .btn-content {
       display: inline-block;
       transition: opacity 0.5s, transform 0.5s;
       opacity: 1;
     }
-    
     .button-87-translation:hover .btn-content {
       opacity: 0;
     }
-    
     .button-87-translation::after {
       content: attr(data-hover);
       position: absolute;
@@ -135,60 +106,9 @@
       line-height: inherit;
       white-space: nowrap;
     }
-    
     .button-87-translation:hover::after {
       opacity: 1;
     }
-    
-    /* Portrait Mode (Vertikal) */
-    @media screen and (orientation: portrait) {
-      .button-container {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 30px;
-      }
-      
-      .button-87-translation {
-        width: calc(33.33% - 20px);
-        min-width: 150px;
-        max-width: 180px;
-      }
-      
-      .button-87-translation:nth-child(4) {
-        margin-top: 10px;
-      }
-    }
-    
-    /* Landscape Mode (Horizontal) */
-    @media screen and (orientation: landscape) {
-      .button-container {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: center;
-        gap: 30px;
-      }
-      
-      .button-87-translation {
-        width: 180px;
-      }
-    }
-    
-    /* Kleine Bildschirme */
-    @media screen and (max-width: 600px) {
-      .button-container {
-        gap: 20px;
-        padding: 15px;
-      }
-      
-      .button-87-translation {
-        width: calc(50% - 15px);
-        min-width: 140px;
-        padding: 12px 20px;
-        font-size: 14px;
-      }
-    }
-    
     .sample-section-wrap {
       position: relative;
       background-color: white;
@@ -445,4 +365,3 @@
   </script>
 </body>
 </html>
-
