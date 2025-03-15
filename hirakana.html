@@ -5,12 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Hiragana &amp; Katakana Quiz</title>
   <style>
-    * {
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: Arial, sans-serif;
       text-align: center;
@@ -23,92 +18,68 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: rgb(255, 255, 255);
+      color: #fff;
       position: relative;
-      padding: 20px;
     }
-    /* Das abgefragte Zeichen (Hiragana oder Katakana) */
+    /* Das angezeigte Zeichen */
     #hiragana {
-      font-size: 72px;
-      margin: 30px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      font-size: 50px;
+      margin: 20px;
     }
     input, button {
-      padding: 15px;
-      font-size: 24px;
-      margin-top: 15px;
-      border-radius: 10px;
+      padding: 10px;
+      font-size: 20px;
+      margin-top: 10px;
     }
-    input {
-      width: 80%;
-      max-width: 400px;
-      border: 2px solid transparent;
-      outline: none;
-      transition: border 0.3s;
-      background: rgba(255, 255, 255, 0.9);
-    }
-    input:focus,
-    input:hover {
-      border: 2px solid black;
-    }
-    input:disabled,
-    input:disabled:hover {
-      border: 2px solid transparent;
-      cursor: default;
-      opacity: 0.7;
-    }
-    #message {
-      margin-top: 25px;
-      font-size: 24px;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
+    #message { margin-top: 20px; font-size: 20px; }
     .glassyNumber {
-      background: rgba(0, 0, 0, 0.5);
-      padding: 8px 12px;
-      border-radius: 12px;
+      background: rgba(0,0,0,0.5);
+      padding: 6px 8px;
+      border-radius: 8px;
       backdrop-filter: blur(5px);
       -webkit-backdrop-filter: blur(5px);
       display: inline-block;
       vertical-align: middle;
-      font-size: 24px;
     }
-    #score, #timer {
-      margin-top: 25px;
-      font-size: 24px;
+    #score, #timer { margin-top: 20px; font-size: 20px; }
+    input {
+      padding: 10px;
+      font-size: 20px;
+      margin-top: 10px;
+      border: 2px solid transparent;
+      outline: none;
+      transition: border 0.3s;
     }
+    input:focus, input:hover { border: 2px solid black; }
+    input:disabled, input:disabled:hover { border: 2px solid transparent; cursor: default; }
     .button-container {
-      margin-top: 30px;
+      margin-top: 20px;
       display: flex;
-      gap: 20px;
-      justify-content: center;
+      gap: 10px;
     }
-    #restart {
-      display: none; 
-    }
+    #restart { display: none; }
     .action-button {
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: rgba(255,255,255,0.7);
       color: black;
       border: none;
-      padding: 15px 30px;
-      font-size: 22px;
-      border-radius: 10px;
+      padding: 10px;
+      font-size: 18px;
+      border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s, transform 0.3s;
-      min-width: 150px;
     }
     .action-button:not(:disabled):hover {
-      background-color: rgba(255, 255, 255, 1);
+      background-color: rgba(255,255,255,0.9);
       transform: scale(1.05);
     }
-    .action-button:disabled,
-    .action-button:disabled:hover {
+    .action-button:disabled, .action-button:disabled:hover {
       opacity: 0.3;
       cursor: default;
       transform: none;
     }
     .action-button.quiz-ended,
     .action-button.quiz-ended:hover {
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: rgba(255,255,255,0.3);
       border: 2px solid transparent;
       color: #999;
       cursor: default;
@@ -119,19 +90,19 @@
     #resultPanel {
       display: none;
       position: fixed;
-      top: calc(-40% + 44px);
+      top: calc(-33% + 44px);
       left: 0;
       width: 100%;
-      height: 40%;
-      background: rgba(0,0,0,0.95);
+      height: 33%;
+      background: rgba(0,0,0,0.9);
       color: white;
       z-index: 1000;
       padding: 20px;
       transition: top 0.3s ease;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
     }
-    #resultPanel.open {
-      top: 0;
-    }
+    #resultPanel.open { top: 0; }
     #togglePanel {
       position: absolute;
       bottom: 0;
@@ -139,64 +110,42 @@
       transform: translateX(-50%);
       cursor: pointer;
       z-index: 1001;
-      width: 40px;
+      width: 44px;
       height: 44px;
-      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     #togglePanel svg {
-      width: 100%;
-      height: 100%;
+      width: 24px;
+      height: 24px;
       stroke: white;
-      stroke-width: 2.5;
+      stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
       fill: none;
       transition: transform 0.2s;
     }
-    #resultPanel.open #togglePanel svg {
-      transform: rotate(180deg);
-    }
+    #resultPanel.open #togglePanel svg { transform: rotate(180deg); }
+    /* Stil für die Liste falscher Antworten */
     #wrongListContainer {
       margin-top: 20px;
-      width: 90%;
-      max-width: 600px;
-      max-height: calc(100% - 100px);
+      width: 400px;
+      max-height: calc(100% - 80px);
       margin: 20px auto 0 auto;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
     }
-    #wrongList p {
-      font-size: 20px;
-      margin: 10px 0;
-    }
-    #wrongListContainer::-webkit-scrollbar {
-      width: 10px;
-    }
+    #wrongListContainer::-webkit-scrollbar { width: 8px; }
     #wrongListContainer::-webkit-scrollbar-track {
       background: rgba(255,255,255,0.1);
-      border-radius: 5px;
+      margin-top: 20%;
+      margin-bottom: 20%;
     }
     #wrongListContainer::-webkit-scrollbar-thumb {
       background: rgba(200,200,200,0.8);
-      border-radius: 5px;
-    }
-    @media (max-width: 768px) {
-      #hiragana {
-        font-size: 60px;
-      }
-      input, button {
-        font-size: 20px;
-      }
-      .action-button {
-        padding: 12px 24px;
-        font-size: 18px;
-      }
-      #message, #score, #timer {
-        font-size: 20px;
-      }
-      .glassyNumber {
-        font-size: 20px;
-      }
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -221,7 +170,7 @@
     <button id="restart" class="action-button" onclick="restartQuiz()">Wiederholen</button>
   </div>
 
-  <!-- Ergebnis-Panel -->
+  <!-- Ergebnis-Panel inkl. Toggle-Button -->
   <div id="resultPanel">
     <div id="resultHeader">
       <h2>Hier siehst du deine falschen Antworten aufgelistet!</h2>
@@ -238,15 +187,11 @@
 
   <script>
     let answerLocked = false;
-    
-    function goBack() {
-      window.location.replace("willkommen.html");
-    }
-    function restartQuiz() {
-      location.reload();
-    }
+    // Zum Zurückkehren (anpassen falls nötig)
+    function goBack() { window.location.href = "hiragana.html"; }
+    function restartQuiz() { location.reload(); }
 
-    // Kombiniertes Mapping: Alle Hiragana und Katakana
+    // Kombiniertes Mapping für Hiragana und Katakana
     const kanaMap = {
       // Hiragana
       "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
@@ -308,8 +253,8 @@
       "ピャ": "pya", "ピュ": "pyu", "ピョ": "pyo"
     };
 
-    // Gruppenobjekt: Alle Zeichen aller Gruppen
-    const hiraganaGroups = {
+    // Gruppenobjekt – hier werden ALLE Zeichen (Hiragana & Katakana) pro Gruppe definiert
+    const kanaGroups = {
       "a": ["あ", "い", "う", "え", "お", "ア", "イ", "ウ", "エ", "オ"],
       "ka": ["か", "き", "く", "け", "こ", "カ", "キ", "ク", "ケ", "コ"],
       "sa": ["さ", "し", "す", "せ", "そ", "サ", "シ", "ス", "セ", "ソ"],
@@ -340,20 +285,18 @@
       "pya": ["ぴゃ", "ぴゅ", "ぴょ", "ピャ", "ピュ", "ピョ"]
     };
 
-    // Alle Zeichen aller Gruppen werden in die Quiz-Liste übernommen.
+    // Erstelle die vollständige Liste aller Kana
     let kanaList = [];
-    for (const group in hiraganaGroups) {
-      kanaList = kanaList.concat(hiraganaGroups[group]);
+    for (const group in kanaGroups) {
+      kanaList = kanaList.concat(kanaGroups[group]);
     }
 
-    let correctAnswers = 0;
-    let totalAnswers = 0;
-    let timerStarted = false;
-    let timeLeft = 600;
-    let timerInterval;
+    let correctAnswers = 0, totalAnswers = 0;
+    let timerStarted = false, timeLeft = 600, timerInterval;
     let wrongResults = [];
     let currentKana = "";
-    
+    let answerLocked = false;
+
     function startTimer() {
       timerInterval = setInterval(() => {
         if (timeLeft <= 0) {
@@ -374,9 +317,15 @@
       }, 1000);
     }
 
+    // Wählt ein zufälliges Zeichen aus der (durchlaufbaren) Liste und entfernt es,
+    // sodass jedes Zeichen genau einmal abgefragt wird.
     function nextQuestion() {
+      if (kanaList.length === 0) {
+        checkEndQuiz();
+        return;
+      }
       const randomIndex = Math.floor(Math.random() * kanaList.length);
-      currentKana = kanaList[randomIndex];
+      currentKana = kanaList.splice(randomIndex, 1)[0];
       document.getElementById("hiragana").textContent = currentKana;
       document.getElementById("answer").value = "";
       document.getElementById("message").textContent = "";
@@ -388,7 +337,6 @@
       const userInputRaw = document.getElementById("answer").value;
       if (userInputRaw.trim() === "") return;
       answerLocked = true;
-
       const userInput = userInputRaw.trim().toLowerCase();
       if (!timerStarted) {
         timerStarted = true;
@@ -399,7 +347,7 @@
         document.getElementById("message").textContent = "Good Boy! ✅";
         correctAnswers++;
       } else {
-        document.getElementById("message").textContent = 
+        document.getElementById("message").textContent =
           `Falsch, du Ayri! ❌ Richtige Antwort: ${kanaMap[currentKana]}`;
         wrongResults.push({
           question: currentKana,
@@ -422,15 +370,15 @@
     }
 
     function checkEndQuiz() {
-      document.getElementById("message").textContent = 
-        "Quiz beendet! Die Zeit ist abgelaufen.";
+      document.getElementById("message").textContent =
+        "Quiz beendet! Alle Hiragana &amp; Katakana wurden abgefragt.";
       document.getElementById("answer").disabled = true;
       const btn = document.getElementById("checkButton");
       btn.disabled = true;
       btn.classList.add("quiz-ended");
       clearInterval(timerInterval);
       document.getElementById("restart").style.display = "block";
-      if(wrongResults.length > 0){
+      if (wrongResults.length > 0) {
         document.getElementById("resultPanel").style.display = "block";
       }
     }
@@ -451,42 +399,30 @@
       });
     }
 
+    // Toggle-Button für das Ergebnis-Panel
     const togglePanel = document.getElementById("togglePanel");
     const resultPanel = document.getElementById("resultPanel");
-    
-    // Für Touch-Geräte
+    togglePanel.addEventListener("click", function(e) {
+      e.preventDefault();
+      if (!resultPanel.classList.contains("open")) {
+        updateWrongList();
+        resultPanel.classList.add("open");
+      } else {
+        resultPanel.classList.remove("open");
+      }
+    });
     togglePanel.addEventListener("touchstart", function(e) {
       e.preventDefault();
       if (!resultPanel.classList.contains("open")) {
         updateWrongList();
         resultPanel.classList.add("open");
-      }
-    });
-    
-    // Für Desktop/Maus
-    togglePanel.addEventListener("mouseenter", function() {
-      if (!resultPanel.classList.contains("open")) {
-        updateWrongList();
-        resultPanel.classList.add("open");
-      }
-    });
-    
-    resultPanel.addEventListener("mouseleave", function() {
-      resultPanel.classList.remove("open");
-    });
-    
-    // Touch-Ende außerhalb des Panels schließt es
-    document.addEventListener("touchstart", function(e) {
-      if (resultPanel.classList.contains("open") && 
-          !resultPanel.contains(e.target) && 
-          e.target !== togglePanel) {
+      } else {
         resultPanel.classList.remove("open");
       }
     });
 
     const answerInput = document.getElementById("answer");
     const checkButton = document.getElementById("checkButton");
-    
     function toggleCheckButton() {
       if (answerInput.disabled) {
         checkButton.disabled = true;
@@ -497,40 +433,16 @@
         }
       }
     }
-    
     answerInput.addEventListener("input", toggleCheckButton);
-    
-    // Für virtuelle Keyboards
-    answerInput.addEventListener("keyup", function(event) {
-      if (event.key === "Enter" && this.value.trim() !== "") {
-        checkAnswer();
-      }
-    });
-    
-    // Für Hardware-Keyboards
+    toggleCheckButton();
+
     answerInput.addEventListener("keydown", function(event) {
       if (event.key === "Enter" && this.value.trim() !== "") {
         checkAnswer();
       }
     });
 
-    // Verhindern des Auto-Zoom auf iOS
-    document.addEventListener('touchstart', function(event) {
-      if (event.touches.length > 1) {
-        event.preventDefault();
-      }
-    }, { passive: false });
-    
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(event) {
-      const now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-
     window.onload = nextQuestion;
   </script>
 </body>
-</html> 
+</html>
